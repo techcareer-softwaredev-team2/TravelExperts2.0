@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Packages.cs" />
+    <Compile Include="PackagesDB.cs" />
     <Compile Include="Packages_Products_Suppliers.cs" />
     <Compile Include="Packages_Products_SuppliersDB.cs" />
     <Compile Include="Products.cs" />

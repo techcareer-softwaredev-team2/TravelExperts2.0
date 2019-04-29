@@ -47,8 +47,10 @@ namespace TravelExpertsData
             using (SqlConnection connection = TravelExpertsDB.GetConnection())
             {
                 // create select command
-                string query = "SELECT ProductSupplierId, ProductId, SupplierId " +
-                               "FROM Products_Suppliers " +
+                string query = "SELECT ProductSupplierId, ps.ProductId, ps.SupplierId,ProdName, SupName " +
+                               "FROM Products_Suppliers ps" +
+                               "JOIN Products p  ON ps.ProductId=p.ProductId "+
+                               "JOIN Suppliers s  ON ps.SupplierId=s.SupplierId " +
                                "WHERE ProductSupplierId=@ProductSupplierId";
                 // any exception not handled here is automaticlly thrown to the form
                 // where the method was called
@@ -94,7 +96,7 @@ namespace TravelExpertsData
             {
                 // create INSERT command
                 // CustomerID is IDENTITY so no value provided
-                string insertStatement = "INSERT INTO Products_Supplier(ProductId, SupplierId) " +
+                string insertStatement = "INSERT INTO Products_Suppliers(ProductId, SupplierId) " +
                                          "OUTPUT inserted.ProductSupplierId " +
                                          "VALUES(@ProductId, @SupplierId)";
 
@@ -140,43 +142,64 @@ namespace TravelExpertsData
             // create the connection 
             using (SqlConnection connection = TravelExpertsDB.GetConnection())
             {
-                string deleteStatement =
+                string deleteStatement1 =
+                   "DELETE FROM Packages_Products_Suppliers " +
+                   "WHERE  ProductSupplierId=@ProductSupplierId ";
+
+                string deleteStatement2 =
                     "DELETE FROM Products_Suppliers " +
                     "WHERE ProductSupplierId=@ProductSupplierId " + // need for identification
                     "AND (ProductId=@ProductId OR ProductId IS NULL AND @ProductId IS NULL) " +
                     "AND (SupplierId=@SupplierId OR SupplierId IS NULL AND @SupplierId IS NULL)";  // the AND is to ensure no one is updating this product                
-                using (SqlCommand cmd = new SqlCommand(deleteStatement, connection))
+
+                connection.Open();
+                // start a location transaction
+                SqlTransaction sqlTran = connection.BeginTransaction();
+
+                // Enlist a command in the current transaction
+                SqlCommand cmd = connection.CreateCommand();
+                cmd.Transaction = sqlTran;
+                //supply paramter value, this way can avoid sql injection problem
+                cmd.Parameters.AddWithValue("@ProductSupplierId", productSupplier.ProductSupplierId);
+
+                if (productSupplier.ProductId == null)
+                     cmd.Parameters.AddWithValue("@ProductId", DBNull.Value);
+                else
+                     cmd.Parameters.AddWithValue("@ProductId", productSupplier.ProductId);
+
+                if (productSupplier.SupplierId == null)
+                     cmd.Parameters.AddWithValue("@SupplierId", DBNull.Value);
+                else
+                    cmd.Parameters.AddWithValue("@SupplierId", productSupplier.SupplierId);
+
+                try
                 {
-                    //supply paramter value, this way can avoid sql injection problem
-                    if (productSupplier.ProductId == null)
-                        cmd.Parameters.AddWithValue("@ProductId", DBNull.Value);
-                    else
-                        cmd.Parameters.AddWithValue("@ProductId", productSupplier.ProductId);
+                    // Execute three separate commands
+                    cmd.CommandText = deleteStatement1;
+                    cmd.ExecuteNonQuery();
+                    cmd.CommandText = deleteStatement2;
+                    cmd.ExecuteNonQuery();
 
-                    if (productSupplier.SupplierId == null)
-                        cmd.Parameters.AddWithValue("@SupplierId", DBNull.Value);
-                    else
-                        cmd.Parameters.AddWithValue("@SupplierId", productSupplier.SupplierId);
-
+                    // Commit the transaction
+                    sqlTran.Commit();
+                    success = true;
+                }
+                catch (Exception )
+                {
                     try
                     {
-                        // open the connection
-                        connection.Open();
-                        // execute the delete command 
-                        int count = cmd.ExecuteNonQuery(); // returns the number of rows affected 
-
-                        // check if successful
-                        if (count > 0)
-                            success = true;
+                        //Atttemp to roll back the transaction
+                        sqlTran.Rollback();
+                        success = false;
                     }
-                    catch (Exception ex)
+                    catch (Exception exRollback)
                     {
-                        throw ex;
+                        throw exRollback;
                     }
-                    finally // executes always
-                    {
-                        connection.Close();
-                    }
+                }
+                finally // executes always
+                {
+                    connection.Close();
                 }
             }
             //return the indicator of success

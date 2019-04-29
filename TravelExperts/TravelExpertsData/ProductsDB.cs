@@ -121,36 +121,64 @@ namespace TravelExpertsData
             // create the connection 
             using (SqlConnection connection = TravelExpertsDB.GetConnection())
             {
-                string deleteStatement =
+                string deleteStatement1 =
+                    "DELETE FROM Packages_Products_Suppliers " +
+                    "WHERE  ProductSupplierId IN " +
+                    "(SELECT ProductSupplierId " +
+                    "FROM Products_Suppliers " +
+                    "WHERE ProductId=@ProductId)";
+
+                string deleteStatement2 =
+                    "DELETE FROM Products_Suppliers " +
+                    "WHERE ProductId=@ProductId";
+
+                string deleteStatement3 =
                     "DELETE FROM Products " +
                     "WHERE ProductId=@ProductId " + // need for identification
                     "AND ProdName=@ProdName";  // the AND is to ensure no one is updating this product
-                using (SqlCommand cmd = new SqlCommand(deleteStatement, connection))
-                {
-                    //supply paramter value, this way can avoid sql injection problem
-                    cmd.Parameters.AddWithValue("@ProductId", product.ProductId);
-                    cmd.Parameters.AddWithValue("@ProdName", product.ProdName);
 
+                connection.Open();
+                // start a location transaction
+                SqlTransaction sqlTran = connection.BeginTransaction();
+
+                // Enlist a command in the current transaction
+                SqlCommand command = connection.CreateCommand();
+                command.Transaction = sqlTran;
+               //supply paramter value, this way can avoid sql injection problem
+                command.Parameters.AddWithValue("@ProductId", product.ProductId);
+                command.Parameters.AddWithValue("@ProdName", product.ProdName);
+
+                try
+                {
+                   // Execute three separate commands
+                     command.CommandText = deleteStatement1;
+                     command.ExecuteNonQuery();
+                     command.CommandText = deleteStatement2;
+                     command.ExecuteNonQuery();
+                     command.CommandText = deleteStatement3;
+                     command.ExecuteNonQuery();
+
+                  // Commit the transaction
+                     sqlTran.Commit();
+                     success = true;
+                }
+                catch (Exception )
+                 {
                     try
                     {
-                        // open the connection
-                        connection.Open();
-                        // execute the delete command 
-                        int count = cmd.ExecuteNonQuery(); // returns the number of rows affected 
-
-                        // check if successful
-                        if (count > 0)
-                            success = true;
+                        //Atttemp to roll back the transaction
+                        sqlTran.Rollback();
+                        success = false;
                     }
-                    catch (Exception ex)
+                    catch (Exception exRollback)
                     {
-                        throw ex;
+                        throw exRollback;
                     }
-                    finally // executes always
-                    {
-                        connection.Close();
-                    }
-                }
+                 }
+                 finally // executes always
+                 {
+                    connection.Close();
+                 }
             }
            //return the indicator of success
             return success;

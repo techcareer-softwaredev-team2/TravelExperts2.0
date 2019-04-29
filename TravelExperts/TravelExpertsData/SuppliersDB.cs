@@ -121,36 +121,63 @@ namespace TravelExpertsData
             // create the connection 
             using (SqlConnection connection = TravelExpertsDB.GetConnection())
             {
-                string deleteStatement =
-                    "DELETE FROM Supplierss " +
-                    "WHERE SupplierId=@SupplierId " + // need for identification
-                    "AND (SupName=@SupName OR " +
-                    "SupName IS NULL AND @SupName IS NULL)";// the AND is to ensure no one is updating this product
-                using (SqlCommand cmd = new SqlCommand(deleteStatement, connection))
-                {
-                    //supply paramter value, this way can avoid sql injection problem
-                    cmd.Parameters.AddWithValue("@SupplierId", supplier.SupplierId);
-                    cmd.Parameters.AddWithValue("@SupName", supplier.SupName);
+                string deleteStatement1 =
+                    "DELETE FROM Packages_Products_Suppliers " +
+                    "WHERE  ProductSupplierId IN " +
+                    "(SELECT ProductSupplierId " +
+                    "FROM Products_Suppliers " +
+                    "WHERE SupplierId=@SupplierId)";
 
+                string deleteStatement2 =
+                    "DELETE FROM Products_Suppliers " +
+                    "WHERE SupplierId=@SupplierId";
+
+                string deleteStatement3 =
+                    "DELETE FROM Suppliers " +
+                    "WHERE SupplierId=@SupplierId " + // need for identification
+                    "AND (SupName=@SupName OR SupName IS NULL AND @SupName IS NULL)";  // the AND is to ensure no one is updating this product
+
+                connection.Open();
+                // start a location transaction
+                SqlTransaction sqlTran = connection.BeginTransaction();
+
+                // Enlist a command in the current transaction
+                SqlCommand command = connection.CreateCommand();
+                command.Transaction = sqlTran;
+                //supply paramter value, this way can avoid sql injection problem
+                command.Parameters.AddWithValue("@SupplierId", supplier.SupplierId);
+                command.Parameters.AddWithValue("@SupName", supplier.SupName);
+
+                try
+                {
+                    // Execute three separate commands
+                    command.CommandText = deleteStatement1;
+                    command.ExecuteNonQuery();
+                    command.CommandText = deleteStatement2;
+                    command.ExecuteNonQuery();
+                    command.CommandText = deleteStatement3;
+                    command.ExecuteNonQuery();
+
+                    // Commit the transaction
+                    sqlTran.Commit();
+                    success = true;
+                }
+                catch (Exception )
+                {
                     try
                     {
-                        // open the connection
-                        connection.Open();
-                        // execute the delete command 
-                        int count = cmd.ExecuteNonQuery(); // returns the number of rows affected 
-
-                        // check if successful
-                        if (count > 0)
-                            success = true;
+                        //Atttemp to roll back the transaction
+                        sqlTran.Rollback();
+                        success = false;
                     }
-                    catch (Exception ex)
+                    catch (Exception exRollback)
                     {
-                        throw ex;
+                        throw exRollback;
                     }
-                    finally // executes always
-                    {
-                        connection.Close();
-                    }
+                }
+                finally // executes always
+                {
+                    connection.Close();
                 }
             }
             //return the indicator of success
