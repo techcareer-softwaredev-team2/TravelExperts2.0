@@ -15,9 +15,5 @@ namespace TravelExpertsData
         public string PkgDesc { get; set; }
         public decimal PkgBasePrice { get; set; }
         public decimal PkgAgencyCommission { get; set; }
-        public override string ToString()
-        {
-            return PkgName + ": " + PkgStartDate + ", " + PkgEndDate+", " + PkgDesc+", "+PkgBasePrice.ToString("c")+", "+ PkgAgencyCommission.ToString("c");
-        }
     }
 }

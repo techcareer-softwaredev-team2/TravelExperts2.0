@@ -19,7 +19,7 @@ namespace TravelExpertsData
             using (SqlConnection connection = TravelExpertsDB.GetConnection())
             {
                 // create select command
-                string query = "SELECT DISTINCT PackageId FROM Packages_Products_Suppliers " +
+                string query = "SELECT PackageId FROM Packages_Products_Suppliers " +
                                "ORDER BY PackageId";
                 // any exception not handled here is automaticlly thrown to the form
                 // where the method was called

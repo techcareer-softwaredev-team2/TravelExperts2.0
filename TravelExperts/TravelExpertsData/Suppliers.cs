@@ -10,9 +10,5 @@ namespace TravelExpertsData
     {
         public int SupplierId { get; set; }
         public string SupName { get; set; }
-        public override string ToString()
-        {
-            return SupplierId.ToString() + ": " + SupName;
-        }
     }
 }

@@ -19,7 +19,7 @@ namespace TravelExpertsData
             using (SqlConnection connection = TravelExpertsDB.GetConnection())
             {
                 // create select command
-                string query = "SELECT ProductSupplierId FROM Products_Suppliers " +
+                string query = "SELECT ProductSupplierId FROM Products " +
                                "ORDER BY ProductSupplierId";
                 // any exception not handled here is automaticlly thrown to the form
                 // where the method was called
@@ -30,7 +30,7 @@ namespace TravelExpertsData
                     // close connection as soon as done with reading
                     while (reader.Read())
                     {
-                        id = (int)reader["ProductSupplierId"];
+                        id = (int)reader["ProductSupplierIds"];
                         productSupplierIds.Add(id);
                     }
                 } // command object recycled
@@ -48,7 +48,7 @@ namespace TravelExpertsData
             {
                 // create select command
                 string query = "SELECT ProductSupplierId, ps.ProductId, ps.SupplierId,ProdName, SupName " +
-                               "FROM Products_Suppliers ps " +
+                               "FROM Products_Suppliers ps" +
                                "JOIN Products p  ON ps.ProductId=p.ProductId "+
                                "JOIN Suppliers s  ON ps.SupplierId=s.SupplierId " +
                                "WHERE ProductSupplierId=@ProductSupplierId";
@@ -80,9 +80,6 @@ namespace TravelExpertsData
                             productSupplier.SupplierId = null; // make it null in the object
                         else // it is not null
                             productSupplier.SupplierId = (int)reader["SupplierId"];
-
-                        productSupplier.ProdName = reader["ProdName"].ToString();
-                        productSupplier.SupName = reader["SupName"].ToString();
                     }
                 } // command object recycled
             } // connection object recyled
