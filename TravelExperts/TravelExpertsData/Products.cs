@@ -10,5 +10,10 @@ namespace TravelExpertsData
     {
         public int ProductId { get; set; }
         public string ProdName { get; set; }
+
+        public override string ToString()
+        {
+            return ProductId.ToString() + ": " + ProdName;
+        }
     }
 }
