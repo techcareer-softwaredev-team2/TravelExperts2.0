@@ -13,7 +13,6 @@ namespace TravelExperts
 {
     public partial class frmMain : Form
     {
-
         List<string> tableNames = null; //all table names
         Products currentProd = null; // empty product
         List<int> productIds = null; // productIds
@@ -154,11 +153,50 @@ namespace TravelExperts
             }
         }
 
+        private void DisplayPackages()
+        {
+            packages = PackagesDB.GetPackages();
+            if (packages != null) // if we have product suppliers to display
+            {
+                lstPackages.Items.Clear();//start with empty list box
+                foreach (Packages pkg in packages)
+                {
+                    lstPackages.Items.Add(pkg);
+                }
+            }
+            else // null this product does not exist - need to refresh combo box
+            {
+                packageIds = PackagesDB.GetPackageIds();
+            }
+        }
+
+        private void DisplayProductSupplierData()
+        {
+            productSupplierIds = Products_SuppliersDB.GetProductSupplierIds();
+            if (currentProductSupplier != null) // if we have product suppliers to display
+            {
+                lstProductSupplierId.Items.Clear();//start with empty list box
+                lstProductSupplierId.Items.Add("Id " + ": " + "Product Name" + ",  " + "Supplier Name");
+                foreach (int id in productSupplierIds)
+                {
+                    Products_Suppliers ps = Products_SuppliersDB.GetProductSupplierById(id);
+                    lstProductSupplierId.Items.Add(ps);
+                }
+            }
+            else // null this product does not exist - need to refresh combo box
+            {
+                productSupplierIds = Products_SuppliersDB.GetProductSupplierIds();
+            }
+        }
+
         private void DisplaySupplierData()
         {
+            supplierIds = SuppliersDB.GetSuppliersIds();
+            cboId.DataSource = supplierIds;
             if (supplierIds != null)
             {
                 txtName.Text = currentSupplier.SupName;
+                cboId.SelectedItem = currentSupplier.SupplierId;
                 lstProductSupplierId.Items.Clear();//start with empty list box
                 lstProductSupplierId.Items.Add("Id " + ": " + "Supplier Name");
                 foreach (int id in supplierIds)
@@ -175,9 +213,12 @@ namespace TravelExperts
 
         private void DisplayProductData()
         {
+            productIds = ProductsDB.GetProductsIds();
+            cboId.DataSource = productIds;
             if (productIds != null)
             {
                 txtName.Text = currentProd.ProdName;
+                cboId.SelectedItem = currentProd.ProductId;
                 lstProductSupplierId.Items.Clear();//start with empty list box
                 lstProductSupplierId.Items.Add("Id " + ": " + "Product Name");
                 foreach (int id in productIds)
@@ -280,50 +321,9 @@ namespace TravelExperts
             }
         }
 
-        private void DisplayCurrentProductSupplierData()
-        {
-            txtName.Text = currentProductSupplier.ProdName;
-            txtName2.Text = currentProductSupplier.SupName;
-        }
-
-        private void DisplayPackages()
-        {
-            packages = PackagesDB.GetPackages();
-            if (packages != null) // if we have product suppliers to display
-            {
-                lstPackages.Items.Clear();//start with empty list box
-                foreach (Packages pkg in packages)
-                {
-                    lstPackages.Items.Add(pkg);
-                }
-            }
-            else // null this product does not exist - need to refresh combo box
-            {
-                packageIds = PackagesDB.GetPackageIds();
-            }
-        }
-
         private void DisplayCurrentPackageProductSupplierData()
         {
             if (productSupplierIds != null) // if we have product suppliers to display
-            {
-                lstProductSupplierId.Items.Clear();//start with empty list box
-                lstProductSupplierId.Items.Add("Id " + ": " + "Product Name" + ",  " + "Supplier Name");
-                foreach(int id in productSupplierIds)
-                {
-                    Products_Suppliers ps = Products_SuppliersDB.GetProductSupplierById(id);
-                    lstProductSupplierId.Items.Add(ps);
-                 }
-            }
-            else // null this product does not exist - need to refresh combo box
-            {
-                packageIds = Packages_Products_SuppliersDB.GetPackageIds();
-            }
-        }
-
-        private void DisplayProductSupplierData()
-        {
-            if (currentProductSupplier != null) // if we have product suppliers to display
             {
                 lstProductSupplierId.Items.Clear();//start with empty list box
                 lstProductSupplierId.Items.Add("Id " + ": " + "Product Name" + ",  " + "Supplier Name");
@@ -335,8 +335,15 @@ namespace TravelExperts
             }
             else // null this product does not exist - need to refresh combo box
             {
-                productSupplierIds = Products_SuppliersDB.GetProductSupplierIds();
+                packageIds = Packages_Products_SuppliersDB.GetPackageIds();
             }
+        }
+
+        private void DisplayCurrentProductSupplierData()
+        {
+            currentProductSupplier = Products_SuppliersDB.GetProductSupplierById(currentProductSupplier.ProductSupplierId);
+            txtName.Text = currentProductSupplier.ProdName;
+            txtName2.Text = currentProductSupplier.SupName;
         }
 
         private void DisplayCurrentSupplierData()
@@ -353,7 +360,7 @@ namespace TravelExperts
 
         private void DisplayCurrentProductData()
         {
-            if ( currentProd != null)
+            if (currentProd != null)
             {
                 txtName.Text = currentProd.ProdName;
             }
@@ -363,5 +370,250 @@ namespace TravelExperts
             }
         }
 
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            string tableName = cboTableNames.SelectedValue.ToString();
+            if (tableName == "Products")
+            {
+                frmAddUpdateProducts addProductForm = new frmAddUpdateProducts();
+                addProductForm.addProduct = true;
+                DialogResult result = addProductForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    currentProd = addProductForm.product;
+                    this.DisplayProductData();
+                }
+            }
+            else if (tableName == "Suppliers")
+            {
+                frmAddUpdateSuppliers addSupplierForm = new frmAddUpdateSuppliers();
+                addSupplierForm.addSupplier = true;
+                DialogResult result = addSupplierForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    currentSupplier = addSupplierForm.supplier;
+                    this.DisplaySupplierData();
+                }
+            }
+            else if (tableName == "Products_Suppliers")
+            {
+                frmAddUpdateProductSupplier addProductSupplierForm = new frmAddUpdateProductSupplier();
+                addProductSupplierForm.addProductSupplier = true;
+                DialogResult result = addProductSupplierForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    currentProductSupplier = addProductSupplierForm.productSupplier;
+                    this.DisplayProductSupplierData();
+                }
+            }
+            else if (tableName == "Packages")
+            {
+                frmAddUpdatePackages addPackageForm = new frmAddUpdatePackages();
+                addPackageForm.addPackage = true;
+                DialogResult result = addPackageForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    currentPackage = addPackageForm.package;
+                    this.DisplayPackages();
+                    this.DisplayProductSupplierData();
+                }
+            }
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            string tableName = cboTableNames.SelectedValue.ToString();
+            if (tableName == "Products")
+            {
+                frmAddUpdateProducts updateProductForm = new frmAddUpdateProducts();
+                updateProductForm.addProduct = false;
+                updateProductForm.product = currentProd;
+                DialogResult result = updateProductForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                   currentProd = updateProductForm.product;
+                    this.DisplayProductData();
+                }
+                else if (result == DialogResult.Retry)
+                {
+                    currentProd=ProductsDB.GetProductById(currentProd.ProductId);
+                    if (currentProd != null)
+                        this.DisplayProductData();
+                }
+            }
+            else if (tableName == "Suppliers")
+            {
+                frmAddUpdateSuppliers updateSupplierForm = new frmAddUpdateSuppliers();
+                updateSupplierForm.addSupplier= false;
+                updateSupplierForm.supplier = currentSupplier;
+                DialogResult result = updateSupplierForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    currentSupplier = updateSupplierForm.supplier;
+                    this.DisplaySupplierData();
+                }
+                else if (result == DialogResult.Retry)
+                {
+                    currentSupplier = SuppliersDB.GetSupplierById(currentSupplier.SupplierId);
+                    if (currentSupplier != null)
+                        this.DisplaySupplierData();
+                }
+            }
+            else if (tableName == "Products_Suppliers")
+            {
+                frmAddUpdateProductSupplier updateProductSupplierForm = new frmAddUpdateProductSupplier();
+                updateProductSupplierForm.addProductSupplier = false;
+                updateProductSupplierForm.productSupplier = currentProductSupplier;
+                DialogResult result = updateProductSupplierForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    this.DisplayCurrentProductSupplierData();
+                    this.DisplayProductSupplierData();
+                }
+                else if (result == DialogResult.Retry)
+                {
+                    currentProductSupplier = Products_SuppliersDB.GetProductSupplierById(currentProductSupplier.ProductSupplierId);
+                    if (currentProductSupplier != null)
+                        this.DisplayCurrentProductSupplierData();
+                        this.DisplayProductSupplierData();
+                        
+                }
+            }
+            else if (tableName == "Packages")
+            {
+                frmAddUpdatePackages updatePackageForm = new frmAddUpdatePackages();
+                updatePackageForm.addPackage = false;
+                updatePackageForm.package = currentPackage;
+                updatePackageForm.currentProductSupplierIds = Packages_Products_SuppliersDB.GetProductSupplierIds(currentPackage.PackageId);
+                DialogResult result = updatePackageForm.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    this.DisplayPackages();
+                    DisplayCurrentPackageProductSupplierData();
+                }
+                else if (result == DialogResult.Retry)
+                {
+                    currentPackage = PackagesDB.GetPackageById(currentPackage.PackageId);
+                    if (currentPackage != null)
+                        DisplayCurrentPackageProductSupplierData();
+                    this.DisplayPackages();
+
+                }
+            }
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            string tableName = cboTableNames.SelectedValue.ToString();
+            if(tableName=="Products")
+            {
+                DialogResult result = MessageBox.Show("Delete " + currentProd.ProdName + "?",
+                "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        if (!ProductsDB.DeleteProduct(currentProd))
+                        {
+                            MessageBox.Show("Another user has updated or deleted " +
+                                "that product.", "Database Error");
+                            currentProd=ProductsDB.GetProductById(currentProd.ProductId);
+                            if (currentProd != null)
+                                this.DisplayProductData();
+                        }
+                        else
+                            this.DisplayProductData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    }
+                }
+            }
+            else if (tableName == "Suppliers")
+            {
+                DialogResult result = MessageBox.Show("Delete " + currentSupplier.SupName + "?",
+                "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        if (!SuppliersDB.DeleteSupplier(currentSupplier))
+                        {
+                            MessageBox.Show("Another user has updated or deleted " +
+                                "that supplier.", "Database Error");
+                            currentSupplier = SuppliersDB.GetSupplierById(currentSupplier.SupplierId);
+                            if (currentSupplier != null)
+                                this.DisplaySupplierData();
+                        }
+                        else
+                            this.DisplaySupplierData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    }
+                }
+            }
+            else if (tableName == "Products_Suppliers")
+            {
+                DialogResult result = MessageBox.Show("Delete Product Supplier " + currentProductSupplier.ProductSupplierId + "?",
+                "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        if (!Products_SuppliersDB.DeleteProductSupplier(currentProductSupplier))
+                        {
+                            MessageBox.Show("Another user has updated or deleted " +
+                                "that product_supplier.", "Database Error");
+                            currentProductSupplier = Products_SuppliersDB.GetProductSupplierById(currentProductSupplier.ProductSupplierId);
+                            if (currentProductSupplier != null)
+                                this.DisplayCurrentProductSupplierData();
+                                this.DisplayProductSupplierData();
+                        }
+                        else
+                            this.DisplayCurrentProductSupplierData();
+                            this.DisplayProductSupplierData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    }
+                }
+            }
+            else if (tableName == "Packages")
+            {
+                DialogResult result = MessageBox.Show("Delete Packages " + currentPackage.PkgName + "?",
+                "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        if (!PackagesDB.DeletePackage(currentPackage))
+                        {
+                            MessageBox.Show("Another user has updated or deleted " +
+                                "that package.", "Database Error");
+                            currentPackage = PackagesDB.GetPackageById(currentPackage.PackageId);
+                            if (currentPackage != null)
+                                //this.DisplayCurrentProductSupplierData();
+                            this.DisplayProductSupplierData();
+                        }
+                        else
+                            //this.DisplayCurrentProductSupplierData();
+                        this.DisplayPackages();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    }
+                }
+            }
+        }
     }
 }

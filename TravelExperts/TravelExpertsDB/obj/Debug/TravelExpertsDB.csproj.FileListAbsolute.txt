@@ -1,0 +1,12 @@
+C:\Users\823714\source\repos\TravelExperts\TravelExpertsDB\bin\Debug\TravelExpertsDB.dll
+C:\Users\823714\source\repos\TravelExperts\TravelExpertsDB\bin\Debug\TravelExpertsDB.pdb
+C:\Users\823714\source\repos\TravelExperts\TravelExpertsDB\obj\Debug\TravelExpertsDB.csprojAssemblyReference.cache
+C:\Users\823714\source\repos\TravelExperts\TravelExpertsDB\obj\Debug\TravelExpertsDB.csproj.CoreCompileInputs.cache
+C:\Users\823714\source\repos\TravelExperts\TravelExpertsDB\obj\Debug\TravelExpertsDB.dll
+C:\Users\823714\source\repos\TravelExperts\TravelExpertsDB\obj\Debug\TravelExpertsDB.pdb
+C:\Users\562088\source\repos\TravelExperts2.0\TravelExperts\TravelExpertsDB\bin\Debug\TravelExpertsDB.dll
+C:\Users\562088\source\repos\TravelExperts2.0\TravelExperts\TravelExpertsDB\bin\Debug\TravelExpertsDB.pdb
+C:\Users\562088\source\repos\TravelExperts2.0\TravelExperts\TravelExpertsDB\obj\Debug\TravelExpertsDB.csprojAssemblyReference.cache
+C:\Users\562088\source\repos\TravelExperts2.0\TravelExperts\TravelExpertsDB\obj\Debug\TravelExpertsDB.csproj.CoreCompileInputs.cache
+C:\Users\562088\source\repos\TravelExperts2.0\TravelExperts\TravelExpertsDB\obj\Debug\TravelExpertsDB.dll
+C:\Users\562088\source\repos\TravelExperts2.0\TravelExperts\TravelExpertsDB\obj\Debug\TravelExpertsDB.pdb

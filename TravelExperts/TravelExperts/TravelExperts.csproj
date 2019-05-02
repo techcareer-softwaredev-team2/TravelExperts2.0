@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8B3DB0F9-F487-423D-BFC5-D1F07BF56151}</ProjectGuid>
+    <ProjectGuid>{34547061-925D-4ECC-8328-8716AB2D9C89}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>TravelExperts</RootNamespace>
     <AssemblyName>TravelExperts</AssemblyName>
@@ -46,6 +46,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAddUpdatePackages.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddUpdatePackages.Designer.cs">
+      <DependentUpon>frmAddUpdatePackages.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddUpdateProducts.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddUpdateProducts.Designer.cs">
+      <DependentUpon>frmAddUpdateProducts.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddUpdateProductSupplier.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddUpdateProductSupplier.Designer.cs">
+      <DependentUpon>frmAddUpdateProductSupplier.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAddUpdateSuppliers.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAddUpdateSuppliers.Designer.cs">
+      <DependentUpon>frmAddUpdateSuppliers.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -54,6 +78,18 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="frmAddUpdatePackages.resx">
+      <DependentUpon>frmAddUpdatePackages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddUpdateProducts.resx">
+      <DependentUpon>frmAddUpdateProducts.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddUpdateProductSupplier.resx">
+      <DependentUpon>frmAddUpdateProductSupplier.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAddUpdateSuppliers.resx">
+      <DependentUpon>frmAddUpdateSuppliers.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -80,9 +116,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TravelExpertsData\TravelExpertsData.csproj">
-      <Project>{8588f7d0-9e96-49b5-9c7b-f44103e32197}</Project>
-      <Name>TravelExpertsData</Name>
+    <ProjectReference Include="..\TravelExpertsDB\TravelExpertsDB.csproj">
+      <Project>{45C74B62-04D2-4A5D-AB2D-B430346A30B0}</Project>
+      <Name>TravelExpertsDB</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
